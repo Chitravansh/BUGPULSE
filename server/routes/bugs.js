@@ -89,6 +89,8 @@ router.post("/", upload.single("image"), async (req, res) => {
     // 🔥 SAFE ACCESS
     const title = req.body?.title;
     const description = req.body?.description;
+    console.log("FILE:", req.file);
+    console.log("BODY:", req.body);
 
     if (!title || !description) {
       return res.status(400).json({ error: "Missing fields" });
@@ -152,6 +154,15 @@ router.get("/", async (req, res) => {
   try {
     const bugs = await Bug.find().sort({ createdAt: -1 });
     res.json(bugs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    await Bug.findByIdAndDelete(req.params.id);
+    res.json({ message: "Bug deleted" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

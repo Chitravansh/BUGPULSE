@@ -27,6 +27,7 @@ mongoose.connect(process.env.MONGO_URI)
  
  //Uploads cann take place
  app.use("/uploads", express.static("uploads"));
+ 
 
 
 app.listen(PORT, ()=> console.log(`Server running on ${PORT}`));

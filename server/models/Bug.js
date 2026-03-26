@@ -17,6 +17,8 @@ const bugSchema = new mongoose.Schema({
     default: 0
   },
 
+  image: { type: String, default: null }, // ✅ ADD THIS
+
 
   createdAt: { type: Date, default: Date.now }
 });
