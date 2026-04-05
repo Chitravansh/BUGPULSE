@@ -1,53 +1,88 @@
-# 🚀 BUGPULSE – Real-Time Bug Reporting and Tracking System
+# 🚀 BUGPULSE – Real-Time AI-Powered Bug Tracking System
 
-BUGPULSE is a full-stack web application designed to simplify bug reporting, tracking, and management. It integrates AI-based duplicate detection, priority prediction, and a modern Kanban-style dashboard for efficient bug lifecycle management.
+BUGPULSE is a full-stack, real-time bug tracking platform enhanced with AI capabilities. It enables teams to report, manage, analyze, and collaborate on bugs efficiently with intelligent insights.
 
 ---
 
-# ✨ Features
+# 📌 Features Overview
 
 ## 🐞 Bug Management
 
-* Create bug reports with title, description, and image upload
-* Drag-and-drop Kanban board (Open → In Progress → Fixed)
-* Delete and Reopen bugs
+* Create bugs with title, description, and image upload
+* Drag-and-drop workflow (Open → In Progress → Fixed)
+* Delete and reopen bugs
 
-## 🧠 AI Capabilities
+## 🤖 AI Integration
 
+* Automatic bug priority prediction (Low / Medium / High)
 * Duplicate bug detection using cosine similarity
-* Automatic priority prediction using ML model
+* AI-generated bug analysis (summary, root cause, suggested fixes)
 
-## 🖼️ Image Support
+## 🔐 Authentication & Roles
 
-* Upload screenshots/logs using Multer
-* Display images in bug cards
+* JWT-based authentication
+* Role-based access control:
 
-## ⚙️ Backend APIs
+  * User → create bugs
+  * Tester → verify bugs
+  * Developer → fix bugs
+  * Admin → full control
 
-* RESTful APIs using Express.js
-* MongoDB for persistent storage
+## 💬 Collaboration System
+
+* Comment on bugs
+* Threaded discussions (optional extension)
+* Admin can delete comments
+
+## 📊 Analytics Dashboard
+
+* Bug status distribution (Pie chart)
+* Priority breakdown (Bar chart)
+* Total bugs overview
+* Real-time updates
+
+## 🔔 Notifications System
+
+* Real-time notifications using Socket.IO
+* Bell icon with unread count
+* Tracks:
+
+  * Bug creation
+  * Status updates
+  * Deletion
+  * Comments
+
+## ⚡ Real-Time System
+
+* Instant updates across users
+* No manual refresh required
 
 ---
 
 # 🏗️ Tech Stack
 
-### Frontend
+## Frontend
 
 * React (Vite)
 * Tailwind CSS
-* @hello-pangea/dnd (Drag & Drop)
+* Recharts (analytics)
+* Axios
+* Socket.IO Client
 
-### Backend
+## Backend
 
-* Node.js + Express
+* Node.js
+* Express.js
 * MongoDB + Mongoose
 * Multer (file uploads)
+* JWT Authentication
+* Socket.IO
 
-### AI / ML
+## AI / ML
 
-* Custom vectorization
-* Cosine similarity
-* Lightweight ML model for priority prediction
+* Custom ML model for priority prediction
+* Cosine similarity for duplicate detection
+* OpenAI API (optional advanced AI insights)
 
 ---
 
@@ -56,99 +91,92 @@ BUGPULSE is a full-stack web application designed to simplify bug reporting, tra
 ```
 BUGPULSE/
 │
-├── client/        # React frontend
+├── client/              # React frontend
 │   ├── src/
-│   ├── .env
+│   └── .env
 │
-├── server/        # Node backend
+├── server/              # Node backend
 │   ├── routes/
 │   ├── models/
-│   ├── uploads/
-│   ├── .env
+│   ├── middleware/
+│   ├── ai/
+│   └── uploads/
 │
 └── README.md
 ```
 
 ---
 
-# ⚙️ Environment Variables
+# ⚙️ Environment Setup
 
-## 📍 Client (`client/.env`)
+## 🔹 Client (.env)
 
 ```
 VITE_PORT=4000
 VITE_API_URL=http://localhost:4000
 ```
 
----
-
-## 📍 Server (`server/.env`)
+## 🔹 Server (.env)
 
 ```
 PORT=4000
 MONGO_URI=mongodb://localhost:27017/Db
+OPENROUTER_API_KEY=your_key_here (optional)
 ```
 
 ---
 
 # ▶️ How to Run the Project
 
-## 🧩 Step 1: Clone Repository
+## 1️⃣ Clone Repository
 
 ```
 git clone https://github.com/Chitravansh/BUGPULSE.git
 cd BUGPULSE
 ```
 
----
+## 2️⃣ Install Dependencies
 
-## 🧩 Step 2: Setup Backend
+### Backend
 
 ```
 cd server
 npm install
 ```
 
-### Start backend server:
+### Frontend
 
 ```
-npm run dev
-```
-
-👉 Server runs on: [http://localhost:4000](http://localhost:4000)
-
----
-
-## 🧩 Step 3: Setup Frontend
-
-```
-cd ../client
+cd client
 npm install
 ```
 
-### Start frontend:
+---
+
+## 3️⃣ Start Backend
 
 ```
+cd server
+node index.js
+```
+
+Expected:
+
+```
+MongoDB connected
+Server running on 4000
+```
+
+---
+
+## 4️⃣ Start Frontend
+
+```
+cd client
 npm run dev
 ```
 
-👉 Frontend runs on: [http://localhost:5173](http://localhost:5173)
-
----
-
-## 🧩 Step 4: Ensure MongoDB is Running
-
-Make sure MongoDB is running locally:
-
-```
-mongodb://localhost:27017/Db
-```
-
----
-
-## 🧩 Step 5: Access Application
-
-Open in browser:
+Open browser:
 
 ```
 http://localhost:5173
@@ -156,64 +184,86 @@ http://localhost:5173
 
 ---
 
-# 📸 Image Upload Notes
+# 🔄 Real-Time Flow (How It Works)
 
-* Uploaded images are stored in:
-
-```
-server/uploads/
-```
-
-* Served via:
-
-```js
-app.use("/uploads", express.static("uploads"));
-```
+1. User performs an action (create/update/delete bug)
+2. Backend processes request
+3. Socket.IO emits event
+4. Frontend listens to event
+5. UI updates instantly
 
 ---
 
-# 🧠 How It Works
+# 🤖 AI Workflow
 
-1. User submits bug with description & image
-2. Backend:
-
-   * Vectorizes description
-   * Predicts priority
-   * Checks duplicate using cosine similarity
-3. Bug stored in MongoDB
-4. Displayed in Kanban board
-5. Status updated via drag-and-drop
+1. User submits bug description
+2. Text is vectorized
+3. Model predicts priority
+4. Similarity check detects duplicates
+5. (Optional) LLM generates analysis
 
 ---
 
-# 🚀 Future Improvements
+# 🔔 Notification Flow
 
-* 🔐 Authentication (JWT-based roles)
-* 💬 Comment system for collaboration
-* 📊 Analytics dashboard (charts & insights)
-* ⚡ Real-time updates using Socket.IO
-* 👨‍💻 Developer assignment system
+1. Action occurs (bug/comment)
+2. Notification saved in DB
+3. Socket event emitted
+4. Frontend updates bell icon + dropdown
 
 ---
 
-# 🧪 API Endpoints
+# 📊 Analytics Flow
 
-| Method | Endpoint               | Description   |
-| ------ | ---------------------- | ------------- |
-| POST   | `/api/bugs`            | Create bug    |
-| GET    | `/api/bugs`            | Get all bugs  |
-| PUT    | `/api/bugs/:id/status` | Update status |
-| DELETE | `/api/bugs/:id`        | Delete bug    |
+1. Backend aggregates bug data
+2. API returns stats
+3. Frontend renders charts
+4. Real-time updates refresh charts
+
+---
+
+# 🧠 Future Enhancements
+
+* Bug assignment system
+* Email notifications
+* AI chatbot for debugging
+* CI/CD integration
+* Advanced NLP models
+
+---
+
+# 🧪 Testing Tips
+
+* Open 2 browser tabs → test real-time
+* Upload images → verify display
+* Move bugs → check analytics updates
+* Add comments → verify notifications
+
+---
+
+# 🧠 Key Learning Outcomes
+
+* Full-stack development
+* Real-time systems (WebSockets)
+* AI/ML integration in web apps
+* Role-based authentication
+* Data visualization
 
 ---
 
 # 👨‍💻 Author
 
-* Ujjwal Srivastava
-* B.Tech IT (2026)
+Developed as a final-year project demonstrating real-world scalable system design.
 
 ---
 
-# ⭐ Final Note
+# ⭐ Conclusion
 
-BUGPULSE bridges the gap between traditional bug tracking systems and modern real-time, AI-driven development workflows.
+BUGPULSE is a complete intelligent bug tracking solution combining:
+
+* AI
+* Real-time collaboration
+* Analytics
+* Modern UI/UX
+
+It showcases production-level architecture and advanced engineering practices.

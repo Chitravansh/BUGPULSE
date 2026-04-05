@@ -4,6 +4,7 @@ const bugSchema = new mongoose.Schema({
   title: String,
   description: String,
   priority: String,
+  aiAnalysis: { type: String },
   status: { type: String, default: "open" },
 
    duplicateOf: {
