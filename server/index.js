@@ -1,11 +1,17 @@
 /** Importing express cors and mongoose and configuration of dotenv */
 
 const express =  require("express");
+
+//connection libraries
 const cors  = require("cors");
+const { Server } = require("socket.io");
 const mongoose = require("mongoose");
+
+//routes
 const authRoutes = require("./routes/auth");
 const commentRoutes = require("./routes/comments");
-const { Server } = require("socket.io");
+const notificationRoutes = require("./routes/notifications");
+
 
 
 require("dotenv").config();
@@ -41,6 +47,10 @@ app.use("/api/auth", authRoutes);
  
  //for the comments 
  app.use("/api/comments", commentRoutes);
+
+
+ // for the notifications
+app.use("/api/notifications", notificationRoutes);
 
 
 //app.listen(PORT, ()=> console.log(`Server running on ${PORT}`));

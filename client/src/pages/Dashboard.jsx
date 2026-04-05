@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { Search, Plus, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { Search, Plus, AlertCircle, CheckCircle2, Clock, Bell } from "lucide-react";
 import Analytics from "../components/Analytics";
 import Comments from "../components/Comments";
 import { io } from "socket.io-client";
@@ -16,11 +16,25 @@ export default function Dashboard({user}) {
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
   const token = localStorage.getItem("token");
+  const [notifications, setNotifications] = useState([]);
+  const [showNotif, setShowNotif] = useState(false);
 
   // const fetchBugs = async () => {
   //   const res = await axios.get(API);
   //   setBugs(res.data);
   // };
+  
+  //Notification fetching 
+  const fetchNotifications = async () => {
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get(`${URL}/api/notifications`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  setNotifications(res.data);
+};
+
   const fetchBugs = async () => {
   const token = localStorage.getItem("token");
 
@@ -33,17 +47,41 @@ export default function Dashboard({user}) {
   setBugs(res.data);
 };
 
+
+//fetch bugs being called 
   useEffect(() => {
     fetchBugs();
   }, []);
 
+  //fetch notification being called
+  useEffect(() => {
+  fetchNotifications();
+}, []);
+
   useEffect(() => {
   const socket = io(URL);
 
-  socket.on("bugCreated", () => fetchBugs());
-  socket.on("bugUpdated", () => fetchBugs());
-  socket.on("bugDeleted", () => fetchBugs());
-  socket.on("commentAdded", () => fetchBugs());
+socket.on("bugCreated", () => {
+  fetchBugs();
+  fetchNotifications();
+});
+
+socket.on("bugUpdated", () => {
+  fetchBugs();
+  fetchNotifications();
+});
+
+socket.on("bugDeleted", () => {
+  fetchBugs();
+  fetchNotifications();
+});
+
+socket.on("commentAdded", () => {
+  fetchBugs();
+  fetchNotifications();
+});
+
+
 
   return () => socket.disconnect();
 }, []);
@@ -138,6 +176,44 @@ export default function Dashboard({user}) {
 
   {/* RIGHT SIDE */}
   <div className="flex items-center gap-4 w-full md:w-auto">
+
+    <div className="relative">
+
+  {/* 🔔 BELL ICON */}
+  <button onClick={() => setShowNotif(!showNotif)} className="relative">
+    <Bell className="w-6 h-6 text-slate-700 hover:text-blue-600" />
+
+    {/* 🔴 UNREAD COUNT BADGE */}
+    {notifications.length > 0 && (
+      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+        {notifications.length > 9 ? "9+" : notifications.length}
+      </span>
+    )}
+  </button>
+
+  {/* 📩 DROPDOWN */}
+  {showNotif && (
+    <div className="absolute right-0 mt-3 w-72 bg-white shadow-xl rounded-2xl p-3 z-50 border border-slate-200">
+      
+      <h3 className="text-sm font-semibold mb-2 text-slate-600">
+        Notifications
+      </h3>
+
+      {notifications.length === 0 ? (
+        <p className="text-sm text-gray-400">No notifications</p>
+      ) : (
+        notifications.map((n) => (
+          <div
+            key={n._id}
+            className="text-sm py-2 border-b last:border-none text-slate-700"
+          >
+            {n.message}
+          </div>
+        ))
+      )}
+    </div>
+  )}
+</div>
 
     {/* 🔍 SEARCH */}
     <div className="relative w-full md:w-80">
@@ -274,8 +350,6 @@ export default function Dashboard({user}) {
                                 </span>
                               </div>
                               <div className="flex items-start gap-2 mt-3 text-xs">
-                               
-                                
                                 {bug.status !== "open" && (
                                   <button
                                     onClick={() =>
@@ -286,15 +360,23 @@ export default function Dashboard({user}) {
                                     Reopen
                                   </button>
                                 )}
-
+                               { user == "admin" && ( 
                                 <button
                                   onClick={() => deleteBug(bug._id)}
                                   className="bg-red-500 text-white px-2 py-1 rounded"
                                 >
                                   Delete
-                                </button>
+                                </button>)}
                               </div>
-                               <Comments bugId={bug._id} user={user} />
+                              {bug.aiAnalysis && (
+                                <div className="bg-blue-50 p-2 rounded text-xs mt-2">
+                                  🤖 AI Insight:
+                                  <pre className="whitespace-pre-wrap">
+                                    {bug.aiAnalysis}
+                                  </pre>
+                                </div>
+                              )}
+                              <Comments bugId={bug._id} user={user} />
                             </div>
                           )}
                         </Draggable>

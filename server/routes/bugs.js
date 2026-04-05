@@ -2,10 +2,13 @@ const router = require("express").Router();
 const Bug = require("../models/Bug");
 const vectorize = require("../ai/vectorizer");
 const { loadModel, predict } = require("../ai/model");
+const { analyzeBug } = require("../ai/llm");
 const cosineSimilarity = require("../ai/similarity");
 const multer = require("multer");
 const path = require("path");
 const auth = require("../middleware/auth");
+const Notification = require("../models/Notification");
+
 
 
 loadModel();
@@ -28,6 +31,7 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
     const description = req.body?.description;
     console.log("FILE:", req.file);
     console.log("BODY:", req.body);
+    const aiAnalysis = await analyzeBug(description);
 
     if (!title || !description) {
       return res.status(400).json({ error: "Missing fields" });
@@ -59,12 +63,19 @@ router.post("/", auth, upload.single("image"), async (req, res) => {
       title,
       description,
       priority,
+      aiAnalysis,
       duplicateOf,
       similarityScore: maxSimilarity,
       image: imagePath,
     });
 
     global.io.emit("bugCreated", newBug); //socket io event
+
+    //notification for creating the bug
+
+    await Notification.create({
+      message: `New bug reported: ${title}`,
+    });
 
     res.json(newBug);
   } catch (err) {
@@ -90,6 +101,11 @@ router.put("/:id/status",auth, async (req, res) => {
 
   //socket io event
   global.io.emit("bugUpdated", bug);
+   
+  // notfication for update
+  await Notification.create({
+    message: `Bug  "${bug.title}" moved to ${status}`,
+  });
 
   res.json(bug);
 });
@@ -113,9 +129,15 @@ router.delete("/:id", auth, async (req, res) => {
 
 
   try {
-    await Bug.findByIdAndDelete(req.params.id);
+    const bug = await Bug.findByIdAndDelete(req.params.id);
     global.io.emit("bugDeleted", req.params.id);
     res.json({ message: "Bug deleted" });
+
+    // notfication for delete
+    await Notification.create({
+      message: `Bug "${bug.title}" Deleted   `,
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
