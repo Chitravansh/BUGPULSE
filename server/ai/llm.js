@@ -1,13 +1,13 @@
 const OpenAI = require("openai");
 
 const client = new OpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
 async function analyzeBug(description) {
   const response = await client.chat.completions.create({
-    model: "stepfun/step-3.5-flash:free",
+    model: "gemini-3-flash-preview",
     messages: [
       {
         role: "system",
