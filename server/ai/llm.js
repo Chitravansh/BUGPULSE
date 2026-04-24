@@ -1,7 +1,7 @@
 const OpenAI = require("openai");
 
 const client = new OpenAI({
-  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+  baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
   apiKey: process.env.OPENROUTER_API_KEY,
 });
 
